@@ -1,0 +1,11 @@
+Package: 
+Type: Package
+Title:
+Version: 1.0
+Date: 
+Author: Michael Komodromos
+Maintainer: Michael Komodromos <mk1019@ic.ac.uk>
+Description: 
+License: 
+Imports: Rcpp (>= 1.0.6)
+LinkingTo: Rcpp, RcppArmadillo
