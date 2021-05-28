@@ -1,2 +1,3 @@
 importFrom(Rcpp, sourceCpp)
-useDynLib(gp, .registration=TRUE)
+useDynLib(survival.ss, .registration=TRUE)
+export(run_sampler)
