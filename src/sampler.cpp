@@ -63,8 +63,10 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
 	B.col(iter) = b;
 	Z.col(iter) = z;
 
-	if (verbose && (iter % (mcmc_samples / 50)) == 0)
+	if (verbose && (iter % (mcmc_samples/50) == 0))
 	    Rcpp::Rcout << "#";
+
+	Rcpp::checkUserInterrupt();
     }
 
     if (verbose)
