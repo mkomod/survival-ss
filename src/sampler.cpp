@@ -4,7 +4,8 @@
 
 // [[Rcpp::export]]
 Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X, 
-	double lambda, double kernel_sd, arma::uword mcmc_samples, bool verbose)
+	double lambda, double a_0, double b_0, double kernel_sd, 
+	arma::uword mcmc_samples, bool verbose)
 {
     arma::uword p = X.n_cols;
     arma::uword n = X.n_rows;
@@ -25,14 +26,14 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
 
     for (arma::uword iter = 0; iter < mcmc_samples; ++iter) {
 	// update w
-	w = R::runif(0, 1);
+	w = R::rbeta(a_0, b_0);
 
 	// update p
 	for (arma::uword j = 0; j < p; ++j) {
 	    z(j) = 0;
-	    double p0 = log(w) + log_PL(X, b % z, Y_sorted, Y_failure); 
+	    double p0 = log(1-w) + log_PL(X, b % z, Y_sorted, Y_failure); 
 	    z(j) = 1;
-	    double p1 = log(1-w) + log_PL(X, b % z, Y_sorted, Y_failure);
+	    double p1 = log(w) + log_PL(X, b % z, Y_sorted, Y_failure);
 	    
 	    // compute the conditional posterior for z(i) and sample from it
 	    double prob0 = sigmoid(p0 - p1);
@@ -47,15 +48,15 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
 	    double b_new = R::rnorm(b_old, kernel_sd * pow(10.0 / lambda, (1.0 - z(j))));
 	    
 	    // MH denominator
-	    double p0 = log_PL(X, b % z, Y_sorted, Y_failure) +
+	    double den = log_PL(X, b % z, Y_sorted, Y_failure) +
 			log_Laplace(b_old, lambda);
 	    
 	    // MH numerator
 	    b(j) = b_new;
-	    double p1 = log_PL(X, b % z, Y_sorted, Y_failure) +
+	    double num = log_PL(X, b % z, Y_sorted, Y_failure) +
 			log_Laplace(b_new, lambda);
 
-	    double a = std::min(1.0, exp(p1 - p0));
+	    double a = std::min(1.0, exp(num - den));
 	    if (a <= R::runif(0, 1)) b(j) = b_old; 
 	}
 	
