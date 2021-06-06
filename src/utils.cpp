@@ -49,8 +49,8 @@ double sigmoid(double x)
 
 // Evaluate the gradient of the log partial likelihood wrt b
 // [[Rcpp::export]]
-arma::rowvec log_PL_grad(arma::mat X, arma::vec b, arma::uvec Y_sorted, 
-	arma::uvec Y_failure)
+arma::rowvec log_PL_grad(const arma::mat &X, const arma::vec &b, 
+	const arma::uvec &Y_sorted, const arma::uvec &Y_failure)
 {
     arma::vec xb = X * b;
     arma::rowvec res = arma::rowvec(b.n_rows, arma::fill::zeros);
@@ -82,3 +82,13 @@ arma::rowvec log_Laplace_grad(arma::vec beta, double lambda)
     return - lambda * sign(beta.t());
 }
 
+
+void leapfrog(arma::vec &b, arma::vec &r, double e, const arma::mat &X,
+	const arma::uvec &Y_sorted, const arma::uvec &Y_failure, double lambda)
+{
+    r += 0.5 * e * log_PL_grad(X, b, Y_sorted, Y_failure).t() +
+	 0.5 * e * log_Laplace_grad(b, lambda).t();
+    b += e * r;
+    r += 0.5 * e * log_PL_grad(X, b, Y_sorted, Y_failure).t() +
+	 0.5 * e * log_Laplace_grad(b, lambda).t();
+}
