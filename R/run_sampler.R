@@ -22,15 +22,15 @@
 #' run_sampler(Y, delta, X, 2)
 #'
 #' @export
-run_sampler <- function(Y, delta, X, lambda, kernel_sd=0.2, 
+run_sampler <- function(Y, delta, X, lambda, a_0=1, b_0=ncol(X), kernel_sd=0.2, 
 	mcmc_samples=5e3, verbose=T)
 {
     if (!is.matrix(X)) stop("X is not a matrix") 
     if (lambda < 0) stop("lambda must be greater than 0")
     if (kernel_sd < 0) stop("kernel_sd must be greater than 0")
 
-    Y_sorted <- order(Y) - 1
-    Y_failure <- which(delta[Y_sorted] == 1) - 1
+    Y_sorted <- order(Y) - 1           # C++ index is 0-based, R is 1-based
+    Y_failure <- which(delta[Y_sorted + 1] == 1) - 1
 
     return(
 	sampler(Y_sorted, Y_failure, X, lambda, kernel_sd, mcmc_samples, verbose)
