@@ -53,7 +53,7 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
 	js = shuffle(js);
 	for (arma::uword j : js) {
 	    double b_old = b(j);
-	    double b_new = R::rnorm(b_old, kernel_sd * pow(L, (1.0 - z(j))));
+	    double b_new = R::rnorm(b_old, kernel_sd*pow(kernel_scale, (1.0-z(j))));
 	    
 	    // MH denominator
 	    double den = log_PL(X, b % z, Y_sorted, Y_failure) +
