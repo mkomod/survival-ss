@@ -83,6 +83,7 @@ arma::rowvec log_Laplace_grad(arma::vec beta, double lambda)
 }
 
 
+// Leapfrog function in HMC
 void leapfrog(arma::vec &b, arma::vec &r, double e, const arma::mat &X,
 	const arma::uvec &Y_sorted, const arma::uvec &Y_failure, double lambda)
 {
