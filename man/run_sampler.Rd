@@ -9,7 +9,10 @@ run_sampler(
   delta,
   X,
   lambda,
+  a_0 = 1,
+  b_0 = ncol(X),
   kernel_sd = 0.2,
+  kernel_scale = 10,
   mcmc_samples = 5000,
   verbose = T
 )
