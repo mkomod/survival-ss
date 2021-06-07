@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // sampler
-Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X, double lambda, double kernel_sd, arma::uword mcmc_samples, bool verbose);
-RcppExport SEXP _survival_ss_sampler(SEXP Y_sortedSEXP, SEXP Y_failureSEXP, SEXP XSEXP, SEXP lambdaSEXP, SEXP kernel_sdSEXP, SEXP mcmc_samplesSEXP, SEXP verboseSEXP) {
+Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X, double lambda, double a_0, double b_0, double kernel_sd, double kernel_scale, arma::uword mcmc_samples, bool verbose);
+RcppExport SEXP _survival_ss_sampler(SEXP Y_sortedSEXP, SEXP Y_failureSEXP, SEXP XSEXP, SEXP lambdaSEXP, SEXP a_0SEXP, SEXP b_0SEXP, SEXP kernel_sdSEXP, SEXP kernel_scaleSEXP, SEXP mcmc_samplesSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,16 +16,49 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::uvec >::type Y_failure(Y_failureSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type a_0(a_0SEXP);
+    Rcpp::traits::input_parameter< double >::type b_0(b_0SEXP);
     Rcpp::traits::input_parameter< double >::type kernel_sd(kernel_sdSEXP);
+    Rcpp::traits::input_parameter< double >::type kernel_scale(kernel_scaleSEXP);
     Rcpp::traits::input_parameter< arma::uword >::type mcmc_samples(mcmc_samplesSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampler(Y_sorted, Y_failure, X, lambda, kernel_sd, mcmc_samples, verbose));
+    rcpp_result_gen = Rcpp::wrap(sampler(Y_sorted, Y_failure, X, lambda, a_0, b_0, kernel_sd, kernel_scale, mcmc_samples, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// log_PL
+double log_PL(arma::mat X, arma::vec b, arma::uvec Y_sorted, arma::uvec Y_failure);
+RcppExport SEXP _survival_ss_log_PL(SEXP XSEXP, SEXP bSEXP, SEXP Y_sortedSEXP, SEXP Y_failureSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type Y_sorted(Y_sortedSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type Y_failure(Y_failureSEXP);
+    rcpp_result_gen = Rcpp::wrap(log_PL(X, b, Y_sorted, Y_failure));
+    return rcpp_result_gen;
+END_RCPP
+}
+// log_PL_grad
+arma::rowvec log_PL_grad(const arma::mat& X, const arma::vec& b, const arma::uvec& Y_sorted, const arma::uvec& Y_failure);
+RcppExport SEXP _survival_ss_log_PL_grad(SEXP XSEXP, SEXP bSEXP, SEXP Y_sortedSEXP, SEXP Y_failureSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type Y_sorted(Y_sortedSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type Y_failure(Y_failureSEXP);
+    rcpp_result_gen = Rcpp::wrap(log_PL_grad(X, b, Y_sorted, Y_failure));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_survival_ss_sampler", (DL_FUNC) &_survival_ss_sampler, 7},
+    {"_survival_ss_sampler", (DL_FUNC) &_survival_ss_sampler, 10},
+    {"_survival_ss_log_PL", (DL_FUNC) &_survival_ss_log_PL, 4},
+    {"_survival_ss_log_PL_grad", (DL_FUNC) &_survival_ss_log_PL_grad, 4},
     {NULL, NULL, 0}
 };
 
