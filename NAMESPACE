@@ -1,3 +1,4 @@
 importFrom(Rcpp, sourceCpp)
 useDynLib(survival.ss, .registration=TRUE)
 export(run_sampler)
+export(log_partial_likelihood)
