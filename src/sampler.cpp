@@ -13,10 +13,10 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
     // save values
     arma::mat Z = arma::mat(p, mcmc_samples, arma::fill::zeros);
     arma::mat B = arma::mat(p, mcmc_samples, arma::fill::zeros);
-    arma::mat W = arma::mat(1, mcmc_samples, arma::fill::zeros);
+    arma::mat W = arma::mat(p, mcmc_samples, arma::fill::zeros);
 
     // initialise
-    double w = R::runif(0, 1);
+    arma::vec w = arma::vec(p, arma::fill::randu);
     arma::vec b = arma::vec(p, arma::fill::randn);
     arma::vec z = arma::vec(p, arma::fill::randu);
     z = arma::round(z);
@@ -32,15 +32,17 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
     for (arma::uword iter = 0; iter < mcmc_samples; ++iter) {
 
 	// update w
-	w = R::rbeta(a_0, b_0);
+	for (arma::uword j : js) {
+	    w(j) = R::rbeta(a_0, b_0);
+	}
 
 	// update p
 	js = shuffle(js);
 	for (arma::uword j : js) {
 	    z(j) = 0;
-	    double p0 = log(1-w) + log_PL(X, b % z, Y_sorted, Y_failure); 
+	    double p0 = log(1-w(j)) + log_PL(X, b % z, Y_sorted, Y_failure); 
 	    z(j) = 1;
-	    double p1 = log(w) + log_PL(X, b % z, Y_sorted, Y_failure);
+	    double p1 = log(w(j)) + log_PL(X, b % z, Y_sorted, Y_failure);
 	    
 	    // compute the conditional posterior for z(i) and sample from it
 	    double prob0 = sigmoid(p0 - p1);
@@ -68,7 +70,7 @@ Rcpp::List sampler(arma::uvec Y_sorted, arma::uvec Y_failure, arma::mat X,
 	    if (a <= R::runif(0, 1)) b(j) = b_old; 
 	}
 
-	W(iter) = w;
+	W.col(iter) = w;
 	B.col(iter) = b;
 	Z.col(iter) = z;
 

@@ -17,7 +17,7 @@ kernel_sd <- .33
 kernel_scale <- 10
 mcmc_samples <- 5000
 verbose <- T
-fit <- sampler(Y_sorted, Y_failure, X, 0.3, kernel_sd, 
+fit <- sampler(Y_sorted, Y_failure, X, 0.3, 1, p, kernel_sd, 
 	       kernel_scale, mcmc_samples, verbose)
 
 apply(fit$z, 1, mean)
